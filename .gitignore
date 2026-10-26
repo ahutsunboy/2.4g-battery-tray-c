@@ -1,0 +1,23 @@
+# 编译产物（build.bat 现场生成，不入库）
+*.exe
+*.o
+*.obj
+*.dll
+*.a
+
+# 运行期产物
+*.log
+fake_batt.txt
+
+# 测试时生成的截图 / 位图
+# 注意：文档用的预览图在 docs/ 下，不在忽略范围里
+probe/*.png
+probe/*.bmp
+probe/*.diff.png
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store

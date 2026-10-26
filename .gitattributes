@@ -1,0 +1,17 @@
+# 默认按文本处理，仓库内统一 LF
+* text=auto eol=lf
+
+# Windows 批处理必须是 CRLF，否则某些语法会异常
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.c    text eol=lf
+*.h    text eol=lf
+*.py   text eol=lf
+*.md   text eol=lf
+*.ini  text eol=lf
+
+*.png  binary
+*.ico  binary
+*.exe  binary
+*.bmp  binary
