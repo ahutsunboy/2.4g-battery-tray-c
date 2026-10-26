@@ -21,16 +21,77 @@ c-tray/
 └─ probe/               内存测量 + 截图 + 窗口探查
 ```
 
-## 构建
+## 从 GitHub 拉下来怎么跑
+
+### 1. 取代码
 
 ```bat
-build.bat          :: dump.exe + capture.exe + dmtest.exe
-build.bat tray     :: 再加 tray.exe
-build.bat lowtest  :: 再加 tray_lowtest.exe（仅测试用，可注入假电量）
+git clone https://github.com/ahutsunboy/2.4g-battery-tray-c.git
+cd 2.4g-battery-tray-c
 ```
 
-工具链：MinGW-w64（本机在 `D:\tools\env\mingw64`）。tray.exe 静态链接，
-不依赖 MinGW / Python / VC 运行库，拷走就能跑。
+没装 git 就在仓库页点 **Code → Download ZIP**，解压后进目录。
+
+### 2. 装编译器：只需要 MinGW-w64
+
+仓库里不存 exe（都由 `build.bat` 现场编译），所以第一次需要一个 C 编译器。
+**不需要 Visual Studio**，一个 64 MB 的 w64devkit 就够：
+
+1. 打开 <https://github.com/skeeto/w64devkit/releases>
+2. 下载 `w64devkit-x64-*.7z.exe`（自解压包）
+3. 解压到任意目录，推荐 `D:\tools\env\mingw64`
+
+`build.bat` 会自动找 gcc，**不用改脚本**，按这个顺序找：
+
+| 顺序 | 位置 |
+|---|---|
+| 1 | 环境变量 `GCC` |
+| 2 | `PATH` 里的 `gcc` |
+| 3 | 仓库旁边的 `..\mingw64\bin\gcc.exe` |
+| 4 | `D:\tools\env\mingw64\bin\gcc.exe` |
+| 5 | `C:\msys64\mingw64\bin\gcc.exe` |
+| 6 | `C:\w64devkit\bin\gcc.exe` |
+| 7 | `%LOCALAPPDATA%\Programs\mingw64\bin\gcc.exe` |
+
+已经装了 MSYS2 的，直接 `set GCC=C:\msys64\mingw64\bin\gcc.exe` 即可。
+验证：`gcc --version` 能打印出版本号。
+
+### 3. 编译
+
+```bat
+build.bat tray
+```
+
+第一行会打印 `using gcc: <实际找到的路径>`，七个目标依次编译，最后输出 `done.`
+主程序就是目录下的 **`tray.exe`，约 81 KB**。
+
+```bat
+build.bat          :: 只编开发工具（dump / capture / dmtest / feat2 / featprobe / iconout）
+build.bat tray     :: 再加主程序 tray.exe
+build.bat lowtest  :: 再加 tray_lowtest.exe（诊断用，可注入假电量，不要拿去分发）
+```
+
+体积就是这么来的：`-O2` 优化、`-mwindows` 不要控制台窗口、
+`-static` 把 libgcc / winpthread 静态链进去、`-s` 去掉符号表。
+
+### 4. 运行
+
+双击 `tray.exe`，没有安装步骤。
+
+- 托盘区出现电池图标（Win11 默认收进 `^` 溢出区，拖到任务栏可以常显）
+- 左键点图标 → 展开卡片；点别处、按 Esc、再点一次图标 都会收起
+- 右键 → 开机自动启动 / 低电量提醒 / 查看日志 / 退出
+- 第一次运行会在 exe 旁边生成 `settings.ini` 和 `tray.log`
+
+**整个文件夹可以随便搬**：U 盘、D 盘、别的电脑都行。程序启动时会把开机自启
+路径校正到自己当前所在的位置，搬完运行一次就重新绑定，不会因为换目录导致自启失效。
+
+系统要求：Windows。实测 Win10 / Win11；用到的都是老 API，DPI 感知那条是运行时
+动态取 `SetProcessDpiAwarenessContext`，取不到会自动降级到系统默认。
+
+### 5. 只想用、不想编译
+
+仓库暂时不放预编译包 —— 一共 81 KB，编译一次几秒钟，按上面第 2、3 步走一遍就有了。
 
 ## 实测占用对比
 

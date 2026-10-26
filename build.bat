@@ -3,14 +3,32 @@ rem ============================================================
 rem  c-tray build script (MinGW-w64 / w64devkit)
 rem  usage:  build.bat             build dev tools only
 rem          build.bat tray        also build tray.exe (main program)
+rem          build.bat lowtest     also build tray_lowtest.exe (test only)
 rem ============================================================
 setlocal
-set "GCC=D:\tools\env\mingw64\bin\gcc.exe"
-if not exist "%GCC%" (
-    echo [ERROR] gcc not found: %GCC%
+
+rem ---- locate gcc: %GCC% > PATH > common install locations ----
+if not defined GCC for /f "delims=" %%i in ('where gcc 2^>nul') do if not defined GCC set "GCC=%%i"
+if not defined GCC if exist "%~dp0..\mingw64\bin\gcc.exe"        set "GCC=%~dp0..\mingw64\bin\gcc.exe"
+if not defined GCC if exist "D:\tools\env\mingw64\bin\gcc.exe"    set "GCC=D:\tools\env\mingw64\bin\gcc.exe"
+if not defined GCC if exist "C:\msys64\mingw64\bin\gcc.exe"       set "GCC=C:\msys64\mingw64\bin\gcc.exe"
+if not defined GCC if exist "C:\w64devkit\bin\gcc.exe"            set "GCC=C:\w64devkit\bin\gcc.exe"
+if not defined GCC if exist "%LOCALAPPDATA%\Programs\mingw64\bin\gcc.exe" set "GCC=%LOCALAPPDATA%\Programs\mingw64\bin\gcc.exe"
+
+if not defined GCC (
+    echo [ERROR] gcc not found.
+    echo.
+    echo   Pick one:
+    echo     1^) put gcc on PATH
+    echo     2^) set GCC=C:\path\to\gcc.exe
+    echo     3^) unpack w64devkit to D:\tools\env\mingw64
+    echo   See the "Build" section of README.md.
     exit /b 1
 )
+
 cd /d "%~dp0"
+echo using gcc: %GCC%
+echo.
 
 set "CFLAGS=-O2 -Wall -Wextra -municode -DUNICODE -D_UNICODE"
 set "LIBS=-lsetupapi -lhid -luser32"
@@ -49,5 +67,6 @@ if /i "%~1"=="lowtest" (
         %LIBS% -lshell32 -lgdi32 || exit /b 1
 )
 
+echo.
 echo done.
 dir /b *.exe
