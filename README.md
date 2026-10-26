@@ -1,6 +1,6 @@
 # c-tray — 2.4G 设备电量托盘（C 版）
 
-Python 版功能等价重写，目标是**极轻**：单个 exe、零运行时依赖、私有内存 2.5 MB 量级。
+[Python 版](https://github.com/ahutsunboy/2.4g-battery-tray-python) 的功能等价重写，目标是**极轻**：单个 exe、零运行时依赖、私有内存 2.5 MB 量级。
 
 ![卡片样式](docs/card-preview.png)
 
